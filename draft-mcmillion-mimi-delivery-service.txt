@@ -1,0 +1,162 @@
+
+
+
+
+More Instant Messaging Interoperability                     B. McMillion
+Internet-Draft                                    Your Organization Here
+Intended status: Informational                              19 June 2024
+Expires: 21 December 2024
+
+
+             Robust and Privacy-Preserving Delivery Service
+              draft-mcmillion-mimi-delivery-service-latest
+
+Abstract
+
+   This document describes a robust and privacy-preserving delivery
+   service architecture for the MIMI working group.
+
+About This Document
+
+   This note is to be removed before publishing as an RFC.
+
+   The latest revision of this draft can be found at
+   https://Bren2010.github.io/draft-mimi-ds/draft-mcmillion-mimi-
+   delivery-service.html.  Status information for this document may be
+   found at https://datatracker.ietf.org/doc/draft-mcmillion-mimi-
+   delivery-service/.
+
+   Discussion of this document takes place on the More Instant Messaging
+   Interoperability Working Group mailing list (mailto:mimi@ietf.org),
+   which is archived at https://mailarchive.ietf.org/arch/browse/mimi/.
+   Subscribe at https://www.ietf.org/mailman/listinfo/mimi/.
+
+   Source for this draft and an issue tracker can be found at
+   https://github.com/Bren2010/draft-mimi-ds.
+
+Status of This Memo
+
+   This Internet-Draft is submitted in full conformance with the
+   provisions of BCP 78 and BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF).  Note that other groups may also distribute
+   working documents as Internet-Drafts.  The list of current Internet-
+   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   This Internet-Draft will expire on 21 December 2024.
+
+Copyright Notice
+
+   Copyright (c) 2024 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+   This document is subject to BCP 78 and the IETF Trust's Legal
+   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+   license-info) in effect on the date of publication of this document.
+   Please review these documents carefully, as they describe your rights
+   and restrictions with respect to this document.  Code Components
+   extracted from this document must include Revised BSD License text as
+   described in Section 4.e of the Trust Legal Provisions and are
+   provided without warranty as described in the Revised BSD License.
+
+Table of Contents
+
+   1.  Introduction
+   2.  Conventions and Definitions
+   3.  Policy Enforcement
+   4.  IANA Considerations
+   5.  Normative References
+   Acknowledgments
+   Author's Address
+
+1.  Introduction
+
+   TODO Introduction
+
+2.  Conventions and Definitions
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+   "OPTIONAL" in this document are to be interpreted as described in
+   BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all
+   capitals, as shown here.
+
+3.  Policy Enforcement
+
+   Generally, a hub or follower DS is only able to enforce "negative"
+   policy on the aspects of the group state that it has visiblity into.
+   "Negative" policy consists of rules for rejecting messages which are
+   unambiguously invalid.  Examples of such rules might include
+   rejecting application messages from a user that is muted, or
+   rejecting a commit that contains an Add proposal for a banned user.
+
+   Keeping in mind that the group may fork when there are buggy or
+   malicious clients, but that clients clearly indicate which fork they
+   are sending their message to, the DS must always make policy
+   enforcmenent decisions with respect to the group state as it exists
+   in the indicated fork.  If one fork of a group exists where a
+   proposal was sent that updated the group metadata to ban a specific
+   user, but another fork exists where this proposal was not sent (or
+   not accepted), the ban must only apply in the fork that accepted the
+   proposal.
+
+   A DS MUST NOT reject messages based on criteria that are not
+   unambiguously known by the DS to be satisfied.  In particular, a DS
+   can not enforce a per-user rate limit on messages sent to the group
+   for any users that are not local to the DS.  When the DS has a local
+   relationship with a user, the DS can authenticate the user and
+   unambiguously rate-limit just them.  However, a hub DS can not rate-
+   limit a follower DS's users without speculating on an MLS message's
+   content.
+
+   It's understood that hub servers will make arrangements with follower
+   servers, where the follower server enforces the hub's policies in
+   situations where the hub can not, as a precondition to interoperate.
+   This includes rate limits but also for example, if one of the
+   follower server's users are banned by the hub, enforcing that the
+   banned user is not allowed in any groups hosted by the hub.  (Noting
+   that the hub would be unable to ban a follower server's user
+   themselves, in cases where a group's handshake messages are
+   encrypted.)
+
+   Ultimately, while a DS can reject _some_ abusive messages, clients
+   must be aware of the policy a group is under and enforce it
+   themselves.  Messages which violate the group's policy MUST be
+   ignored and supressed by the UI, as if they were cryptographically
+   invalid.  Clients SHOULD report to their local DS when the hub or
+   another follower is not meeting the preconditions to interoperate.
+
+   A DS MUST NOT enforce "positive" policy decisions, consisting of
+   rules that require a given message to be accepted by the members of
+   the group.
+
+4.  IANA Considerations
+
+   This document has no IANA actions.
+
+5.  Normative References
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
+              <https://www.rfc-editor.org/rfc/rfc2119>.
+
+   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+              May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
+
+Acknowledgments
+
+   TODO acknowledge.
+
+Author's Address
+
+   Brendan McMillion
+   Your Organization Here
+   Email: brendanmcmillion@gmail.com
