@@ -55,18 +55,43 @@ Local Service Provider (LSP):
 : The Service Provider preferred by the referenced user.
 
 Remote Service Provider (RSP):
-: Any Service Provider used by a user which is not the hub or the LSP.
+: Any Service Provider which is not the LSP.
 
-The **hub** is the Service Provider which created a given group. Group messages
-and Welcome messages are always sent to the hub for sequencing and fanout. A hub
-may interact with several **follower** Service Providers, when those providers
-have users that wish to participate in the group.
+Hub:
+: The Service Provider which created and hosts a referenced group. Group
+  messages and Welcome messages are always sent to the hub for sequencing and
+  fanout.
+
+Follower:
+: Service Providers that interact with a hub to allow their users to interact
+  with a group which the hub hosts.
 
 {::boilerplate bcp14-tagged}
 
+# Partition Keys
+
+A partition key is a short secret that group members export from the MLS key
+schedule. Whenever members send or receive group messages, they provide the
+partition key for the current epoch. Messages sent with a given partition key
+are only provided to users who request to receive messages with the same
+partition key. (Exceptions may be selectively made for external commits /
+proposals, given that the sender isn't in the group yet.)
+
+The partition key acts as epoch-level access control, in addition to the group
+ID. Users which have been removed from a group may still be able to message the
+group, as they know the group ID. However, they will not know the correct
+partition key.
+
+Service Providers MUST NOT implement hard-and-fast rules about which partition
+keys are acceptable. Instead, it should be considered as a general signal of
+abuse or spam.
+
 # Endpoints
 
-The following endpoints are provided by a Delivery Service.
+The following endpoints are provided by a Delivery Service. All endpoints
+exposed by a Delivery Service are accessed by third-party Service Providers, for
+the purpose of learning about the Service Provider's users or interacting with a
+group for which the Service Provider is the hub.
 
 ## Key Packages
 
@@ -77,8 +102,8 @@ bearer token may or may not be unique to the user who requested it, depending on
 the RSP's preference.
 
 When a user wishes to fetch a KeyPackage for the purpose of adding a user to a
-group, the user submits a `KeyPackageRequest` to the RSP, with its LSP as the
-proxy:
+group, the user submits a `KeyPackageRequest` to the RSP, with its LSP acting as
+an OHTTP proxy:
 
 ~~~ tls-presentation
 struct {
@@ -119,6 +144,127 @@ shared by every user. Alternatively, users may be provided a uniquely
 identifying bearer token. Bearer tokens that are abused may be invalidated
 at-will by the RSP, triggering users to go through the discovery flow again.
 
+## Sending Messages
+
+When a follower has a user participating in a group, and that user wishes to
+send a message, the follower issues a `SendRequest` to the hub:
+
+~~~ tls-presentation
+opaque PartitionKey<16>;
+opaque ServiceProviderId<V>;
+
+struct {
+  MLSMessage welcome; // Welcome
+  ServiceProviderId service_providers<V>;
+} WelcomeData;
+
+struct {
+  optional<MLSMessage> group_info; // GroupInfo
+  optional<WelcomeData> welcome_data;
+} CommitData;
+
+struct {
+  MLSMessage message; // PublicMessage or PrivateMessage
+  PartitionKey partition_key;
+  select (SendRequest.message.content_type) {
+    case application:
+    case proposal:
+    case commit:
+      CommitData commit_data;
+  }
+} SendRequest;
+~~~
+
+The hub rejects the message if the `group_id` of `message doesn't match any
+known group. Otherwise, the hub sequences the message to the provided
+`partition_key` of the group, and pushes the Welcome to any providers.
+
+If the message is a commit, then a `CommitData` is provided which contains an
+optional GroupInfo in `group_info` if external joining is supported. If any
+Welcome messages need to be sent, a `WelcomeData` is provided which contains the
+Welcome in `welcome`, and a list of service provider ids in `service_providers`.
+The `service_providers` array MUST be the same length as the `secrets` array of
+the Welcome message. Each provider indicated in `service_providers` corresponds
+one-to-one with the user at the same entry in the `secrets` array.
+
+If `group_info` does not have a `ratchet_tree` extension and the hub is unable
+to infer a ratchet tree that matches `GroupInfo.group_context.tree_hash`, the
+hub rejects the request such that it can be retried with an explicit ratchet
+tree provided.
+
+## Welcome
+
+When a user of a non-hub Service Provider is added to a group, the hub first
+contacts the Service Provider and lists the `KeyPackageRef` entries that were
+indicated as belonging to this Service Provider. If the Service Provider
+responds affirmatively, the hub pushes the Welcome message.
+
+The first step is done by sending a `WelcomeInitRequest` to the Service
+Provider:
+
+~~~ tls-presentation
+struct {
+  KeyPackageRef key_package_refs<V>;
+} WelcomeInitRequest;
+~~~
+
+The Welcome message is provided as an encoded `MLSMessage`.
+
+## Receiving Messages
+
+When a follower has a user participating in a group, and that user wishes to
+receive a message, the follower issues a `ReceiveRequest` to the hub:
+
+~~~ tls-presentation
+struct {
+  PartitionKey partition_key;
+  uint32 counter;
+} ReceiveRequest;
+~~~
+
+The `partition_key` field contains the partition key that the user wishes to
+receive messages for, and the `counter` field contains the number of messages
+the user has already received in that partition. The hub responds with the
+following, which represents a series of messages in a series of epochs:
+
+~~~ tls-presentation
+opaque MaskedPartitionKey<V>;
+
+struct {
+  MLSMessage message; // PublicMessage or PrivateMessage
+  select (Message.message.content_type) {
+    case application:
+    case proposal:
+    case commit:
+      optional<MLSMessage> group_info; // GroupInfo
+  }
+} Message;
+
+struct {
+  Message messages<V>;
+} Epoch;
+
+struct {
+  MaskedPartitionKey masked_partition_key; // = Hash(partition_key)
+  Epoch epoch;
+} HintedEpoch;
+
+struct {
+  Epoch epoch;
+  HintedEpoch hints<V>;
+} ReceiveResponse;
+~~~
+
+The `epoch` field contains a list of messages sent to the requested
+`partition_key`, skipping the first `counter` messages. Messages sent to other
+epochs may be provided in `hints`. Each `HintedEpoch` structure contains a
+masked partition key and a list of messages sent to that partition key
+(skipping none).
+
+The same epoch may not be referenced twice separately in the same
+`ReceiveResponse`. No order between epochs may be inferred by the order in
+`hints`. However, the order of the `messages` array in each `Epoch` does reflect
+the order that the messages were sequenced and should be processed.
 
 # Policy Enforcement
 
