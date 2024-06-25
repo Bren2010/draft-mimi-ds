@@ -266,6 +266,43 @@ The same epoch may not be referenced twice separately in the same
 `hints`. However, the order of the `messages` array in each `Epoch` does reflect
 the order that the messages were sequenced and should be processed.
 
+The hub MAY proactively push `ReceiveResponse` structures to a following Service
+Provider.
+
+When processing Commits, users MUST ignore Commits with an invalid `group_info`.
+
+## External Joins
+
+A user that wishes to perform an external join to a group may do so by sending
+an `ExternalJoinRequest` to the hub:
+
+~~~ tls-presentation
+struct {
+  MLSMessage message; // PublicMessage
+  CommitData commit_data;
+} ExternalJoinRequest;
+~~~
+
+If the hub recognizes the `group_id` and successfully validates the request, it
+sequences the message to the most recent partition key of the group.
+
+A group does not require a published GroupInfo to allow `ExternalJoinRequests`,
+however a user can request it as follows:
+
+~~~ tls-presentation
+struct {
+  opaque group_id<V>;
+} GroupInfoRequest;
+
+struct {
+  MLSMessage group_info; // GroupInfo;
+  optional<RatchetTree> ratchet_tree;
+} GroupInfoResponse;
+~~~
+
+The hub MAY provide an inferred ratchet tree in `ratchet_tree` if one is not
+present in the `group_info`.
+
 # Policy Enforcement
 
 Generally, a hub or follower DS is only able to enforce "negative" policy on the
