@@ -1034,7 +1034,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
 </tr></thead>
 <tfoot><tr>
 <td class="left">McMillion</td>
-<td class="center">Expires 21 December 2024</td>
+<td class="center">Expires 27 December 2024</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1047,12 +1047,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-mcmillion-mimi-delivery-service-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2024-06-19" class="published">19 June 2024</time>
+<time datetime="2024-06-25" class="published">25 June 2024</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Informational</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2024-12-21">21 December 2024</time></dd>
+<dd class="expires"><time datetime="2024-12-27">27 December 2024</time></dd>
 <dt class="label-authors">Author:</dt>
 <dd class="authors">
 <div class="author">
@@ -1105,7 +1105,7 @@ messages.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 21 December 2024.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 27 December 2024.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1141,32 +1141,44 @@ messages.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
             <p id="section-toc.1-1.2.1" class="keepWithNext"><a href="#section-2" class="auto internal xref">2</a>.  <a href="#name-conventions-and-definitions" class="internal xref">Conventions and Definitions</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3">
-            <p id="section-toc.1-1.3.1"><a href="#section-3" class="auto internal xref">3</a>.  <a href="#name-endpoints" class="internal xref">Endpoints</a></p>
+            <p id="section-toc.1-1.3.1" class="keepWithNext"><a href="#section-3" class="auto internal xref">3</a>.  <a href="#name-partition-keys" class="internal xref">Partition Keys</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4">
+            <p id="section-toc.1-1.4.1"><a href="#section-4" class="auto internal xref">4</a>.  <a href="#name-endpoints" class="internal xref">Endpoints</a></p>
 <ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.1">
-                <p id="section-toc.1-1.3.2.1.1"><a href="#section-3.1" class="auto internal xref">3.1</a>.  <a href="#name-key-packages" class="internal xref">Key Packages</a></p>
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.1">
+                <p id="section-toc.1-1.4.2.1.1"><a href="#section-4.1" class="auto internal xref">4.1</a>.  <a href="#name-key-packages" class="internal xref">Key Packages</a></p>
 <ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.1.2.1">
-                    <p id="section-toc.1-1.3.2.1.2.1.1" class="keepWithNext"><a href="#section-3.1.1" class="auto internal xref">3.1.1</a>.  <a href="#name-privacy" class="internal xref">Privacy</a></p>
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.1.2.1">
+                    <p id="section-toc.1-1.4.2.1.2.1.1"><a href="#section-4.1.1" class="auto internal xref">4.1.1</a>.  <a href="#name-privacy" class="internal xref">Privacy</a></p>
 </li>
                 </ul>
 </li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2">
+                <p id="section-toc.1-1.4.2.2.1"><a href="#section-4.2" class="auto internal xref">4.2</a>.  <a href="#name-sending-messages" class="internal xref">Sending Messages</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.3">
+                <p id="section-toc.1-1.4.2.3.1"><a href="#section-4.3" class="auto internal xref">4.3</a>.  <a href="#name-welcome" class="internal xref">Welcome</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.4">
+                <p id="section-toc.1-1.4.2.4.1"><a href="#section-4.4" class="auto internal xref">4.4</a>.  <a href="#name-receiving-messages" class="internal xref">Receiving Messages</a></p>
+</li>
             </ul>
 </li>
-          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4">
-            <p id="section-toc.1-1.4.1"><a href="#section-4" class="auto internal xref">4</a>.  <a href="#name-policy-enforcement" class="internal xref">Policy Enforcement</a></p>
-</li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5">
-            <p id="section-toc.1-1.5.1"><a href="#section-5" class="auto internal xref">5</a>.  <a href="#name-iana-considerations" class="internal xref">IANA Considerations</a></p>
+            <p id="section-toc.1-1.5.1"><a href="#section-5" class="auto internal xref">5</a>.  <a href="#name-policy-enforcement" class="internal xref">Policy Enforcement</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6">
-            <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>.  <a href="#name-normative-references" class="internal xref">Normative References</a></p>
+            <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>.  <a href="#name-iana-considerations" class="internal xref">IANA Considerations</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7">
-            <p id="section-toc.1-1.7.1"><a href="#appendix-A" class="auto internal xref"></a><a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
+            <p id="section-toc.1-1.7.1"><a href="#section-7" class="auto internal xref">7</a>.  <a href="#name-normative-references" class="internal xref">Normative References</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8">
-            <p id="section-toc.1-1.8.1"><a href="#appendix-B" class="auto internal xref"></a><a href="#name-authors-address" class="internal xref">Author's Address</a></p>
+            <p id="section-toc.1-1.8.1"><a href="#appendix-A" class="auto internal xref"></a><a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9">
+            <p id="section-toc.1-1.9.1"><a href="#appendix-B" class="auto internal xref"></a><a href="#name-authors-address" class="internal xref">Author's Address</a></p>
 </li>
         </ul>
 </nav>
@@ -1194,40 +1206,72 @@ messages.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
         <dd class="break"></dd>
 <dt id="section-2-2.3">Remote Service Provider (RSP):</dt>
         <dd style="margin-left: 1.5em" id="section-2-2.4">
-          <p id="section-2-2.4.1">Any Service Provider used by a user which is not the hub or the LSP.<a href="#section-2-2.4.1" class="pilcrow">¶</a></p>
+          <p id="section-2-2.4.1">Any Service Provider which is not the LSP.<a href="#section-2-2.4.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-2-2.5">Hub:</dt>
+        <dd style="margin-left: 1.5em" id="section-2-2.6">
+          <p id="section-2-2.6.1">The Service Provider which created and hosts a referenced group. Group
+messages and Welcome messages are always sent to the hub for sequencing and
+fanout.<a href="#section-2-2.6.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-2-2.7">Follower:</dt>
+        <dd style="margin-left: 1.5em" id="section-2-2.8">
+          <p id="section-2-2.8.1">Service Providers that interact with a hub to allow their users to interact
+with a group which the hub hosts.<a href="#section-2-2.8.1" class="pilcrow">¶</a></p>
 </dd>
       <dd class="break"></dd>
 </dl>
-<p id="section-2-3">The <strong>hub</strong> is the Service Provider which created a given group. Group messages
-and Welcome messages are always sent to the hub for sequencing and fanout. A hub
-may interact with several <strong>follower</strong> Service Providers, when those providers
-have users that wish to participate in the group.<a href="#section-2-3" class="pilcrow">¶</a></p>
-<p id="section-2-4">The key words "<span class="bcp14">MUST</span>", "<span class="bcp14">MUST NOT</span>", "<span class="bcp14">REQUIRED</span>", "<span class="bcp14">SHALL</span>", "<span class="bcp14">SHALL NOT</span>", "<span class="bcp14">SHOULD</span>", "<span class="bcp14">SHOULD NOT</span>", "<span class="bcp14">RECOMMENDED</span>", "<span class="bcp14">NOT RECOMMENDED</span>",
+<p id="section-2-3">The key words "<span class="bcp14">MUST</span>", "<span class="bcp14">MUST NOT</span>", "<span class="bcp14">REQUIRED</span>", "<span class="bcp14">SHALL</span>", "<span class="bcp14">SHALL NOT</span>", "<span class="bcp14">SHOULD</span>", "<span class="bcp14">SHOULD NOT</span>", "<span class="bcp14">RECOMMENDED</span>", "<span class="bcp14">NOT RECOMMENDED</span>",
 "<span class="bcp14">MAY</span>", and "<span class="bcp14">OPTIONAL</span>" in this document are to be interpreted as
 described in BCP 14 <span>[<a href="#RFC2119" class="cite xref">RFC2119</a>]</span> <span>[<a href="#RFC8174" class="cite xref">RFC8174</a>]</span> when, and only when, they
-appear in all capitals, as shown here.<a href="#section-2-4" class="pilcrow">¶</a></p>
+appear in all capitals, as shown here.<a href="#section-2-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="partition-keys">
+<section id="section-3">
+      <h2 id="name-partition-keys">
+<a href="#section-3" class="section-number selfRef">3. </a><a href="#name-partition-keys" class="section-name selfRef">Partition Keys</a>
+      </h2>
+<p id="section-3-1">A partition key is a short secret that group members export from the MLS key
+schedule. Whenever members send or receive group messages, they provide the
+partition key for the current epoch. Messages sent with a given partition key
+are only provided to users who request to receive messages with the same
+partition key. (Exceptions may be selectively made for external commits /
+proposals, given that the sender isn't in the group yet.)<a href="#section-3-1" class="pilcrow">¶</a></p>
+<p id="section-3-2">The partition key acts as epoch-level access control, in addition to the group
+ID. Users which have been removed from a group may still be able to message the
+group, as they know the group ID. However, they will not know the correct
+partition key.<a href="#section-3-2" class="pilcrow">¶</a></p>
+<p id="section-3-3">Service Providers <span class="bcp14">MUST NOT</span> implement hard-and-fast rules about which partition
+keys are acceptable. Instead, it should be considered as a general signal of
+abuse or spam.<a href="#section-3-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="endpoints">
-<section id="section-3">
+<section id="section-4">
       <h2 id="name-endpoints">
-<a href="#section-3" class="section-number selfRef">3. </a><a href="#name-endpoints" class="section-name selfRef">Endpoints</a>
+<a href="#section-4" class="section-number selfRef">4. </a><a href="#name-endpoints" class="section-name selfRef">Endpoints</a>
       </h2>
-<p id="section-3-1">The following endpoints are provided by a Delivery Service.<a href="#section-3-1" class="pilcrow">¶</a></p>
+<p id="section-4-1">The following endpoints are provided by a Delivery Service. All endpoints
+exposed by a Delivery Service are accessed by third-party Service Providers, for
+the purpose of learning about the Service Provider's users or interacting with a
+group for which the Service Provider is the hub.<a href="#section-4-1" class="pilcrow">¶</a></p>
 <div id="key-packages">
-<section id="section-3.1">
+<section id="section-4.1">
         <h3 id="name-key-packages">
-<a href="#section-3.1" class="section-number selfRef">3.1. </a><a href="#name-key-packages" class="section-name selfRef">Key Packages</a>
+<a href="#section-4.1" class="section-number selfRef">4.1. </a><a href="#name-key-packages" class="section-name selfRef">Key Packages</a>
         </h3>
-<p id="section-3.1-1">It's assumed that users have already interacted with a Discovery Service to
+<p id="section-4.1-1">It's assumed that users have already interacted with a Discovery Service to
 learn the user ID and preferred Service Provider of their contacts. As part of
 discovery, users also receive a bearer token associated with each contact. The
 bearer token may or may not be unique to the user who requested it, depending on
-the RSP's preference.<a href="#section-3.1-1" class="pilcrow">¶</a></p>
-<p id="section-3.1-2">When a user wishes to fetch a KeyPackage for the purpose of adding a user to a
-group, the user submits a <code>KeyPackageRequest</code> to the RSP, with its LSP as the
-proxy:<a href="#section-3.1-2" class="pilcrow">¶</a></p>
-<div class="lang-tls-presentation sourcecode" id="section-3.1-3">
+the RSP's preference.<a href="#section-4.1-1" class="pilcrow">¶</a></p>
+<p id="section-4.1-2">When a user wishes to fetch a KeyPackage for the purpose of adding a user to a
+group, the user submits a <code>KeyPackageRequest</code> to the RSP, with its LSP acting as
+an OHTTP proxy:<a href="#section-4.1-2" class="pilcrow">¶</a></p>
+<div class="lang-tls-presentation sourcecode" id="section-4.1-3">
 <pre>
 struct {
   opaque user_id&lt;V&gt;;
@@ -1235,97 +1279,227 @@ struct {
   ProtocolVersion version;
   CipherSuite cipher_suite;
 } KeyPackageRequest;
-</pre><a href="#section-3.1-3" class="pilcrow">¶</a>
+</pre><a href="#section-4.1-3" class="pilcrow">¶</a>
 </div>
-<p id="section-3.1-4">The <code>user_id</code> field contains the Service-Specific Identifier of the user,
+<p id="section-4.1-4">The <code>user_id</code> field contains the Service-Specific Identifier of the user,
 <code>bearer_token</code> contains the bearer token learned during discovery, and <code>version</code>
 and <code>cipher_suite</code> contain the desired MLS group parameters. The RSP responds
-with a <code>KeyPackageResponse</code> structure that matches the requested parameters:<a href="#section-3.1-4" class="pilcrow">¶</a></p>
-<div class="lang-tls-presentation sourcecode" id="section-3.1-5">
+with a <code>KeyPackageResponse</code> structure that matches the requested parameters:<a href="#section-4.1-4" class="pilcrow">¶</a></p>
+<div class="lang-tls-presentation sourcecode" id="section-4.1-5">
 <pre>
 struct {
   KeyPackage key_package;
 } KeyPackageResponse;
-</pre><a href="#section-3.1-5" class="pilcrow">¶</a>
+</pre><a href="#section-4.1-5" class="pilcrow">¶</a>
 </div>
 <div id="privacy">
-<section id="section-3.1.1">
+<section id="section-4.1.1">
           <h4 id="name-privacy">
-<a href="#section-3.1.1" class="section-number selfRef">3.1.1. </a><a href="#name-privacy" class="section-name selfRef">Privacy</a>
+<a href="#section-4.1.1" class="section-number selfRef">4.1.1. </a><a href="#name-privacy" class="section-name selfRef">Privacy</a>
           </h4>
-<p id="section-3.1.1-1">Several <code>KeyPackageRequest</code> structures <span class="bcp14">MAY</span> be bundled into the same transaction,
+<p id="section-4.1.1-1">Several <code>KeyPackageRequest</code> structures <span class="bcp14">MAY</span> be bundled into the same transaction,
 if a user needs KeyPackages from many users of the same service and is
-comfortable leaking that these users are associated.<a href="#section-3.1.1-1" class="pilcrow">¶</a></p>
-<p id="section-3.1.1-2">Note that the <code>KeyPackageRequest</code> and <code>KeyPackageResponse</code> structures are
+comfortable leaking that these users are associated.<a href="#section-4.1.1-1" class="pilcrow">¶</a></p>
+<p id="section-4.1.1-2">Note that the <code>KeyPackageRequest</code> and <code>KeyPackageResponse</code> structures are
 exchanged over OHTTP. This is done primarily to prevent the LSP from learning
 who their local user wishes to contact, but it also restricts how much the RSP
-can learn about who wants to contact their user:<a href="#section-3.1.1-2" class="pilcrow">¶</a></p>
-<p id="section-3.1.1-3">To prevent abuse (such as constantly exhausting a user's uploaded KeyPackages),
+can learn about who wants to contact their user:<a href="#section-4.1.1-2" class="pilcrow">¶</a></p>
+<p id="section-4.1.1-3">To prevent abuse (such as constantly exhausting a user's uploaded KeyPackages),
 this endpoint is protected with a bearer token learned during discovery. The RSP
 can construct the bearer token however it feels is necessary to preserve privacy
 and manage abuse. If abuse is a non-issue, a bearer token can be long-lived and
 shared by every user. Alternatively, users may be provided a uniquely
 identifying bearer token. Bearer tokens that are abused may be invalidated
-at-will by the RSP, triggering users to go through the discovery flow again.<a href="#section-3.1.1-3" class="pilcrow">¶</a></p>
+at-will by the RSP, triggering users to go through the discovery flow again.<a href="#section-4.1.1-3" class="pilcrow">¶</a></p>
 </section>
 </div>
+</section>
+</div>
+<div id="sending-messages">
+<section id="section-4.2">
+        <h3 id="name-sending-messages">
+<a href="#section-4.2" class="section-number selfRef">4.2. </a><a href="#name-sending-messages" class="section-name selfRef">Sending Messages</a>
+        </h3>
+<p id="section-4.2-1">When a follower has a user participating in a group, and that user wishes to
+send a message, the follower issues a <code>SendRequest</code> to the hub:<a href="#section-4.2-1" class="pilcrow">¶</a></p>
+<div class="lang-tls-presentation sourcecode" id="section-4.2-2">
+<pre>
+opaque PartitionKey&lt;16&gt;;
+opaque ServiceProviderId&lt;V&gt;;
+
+struct {
+  MLSMessage welcome; // Welcome
+  ServiceProviderId service_providers&lt;V&gt;;
+} WelcomeData;
+
+struct {
+  optional&lt;MLSMessage&gt; group_info; // GroupInfo
+  optional&lt;WelcomeData&gt; welcome_data;
+} CommitData;
+
+struct {
+  MLSMessage message; // PublicMessage or PrivateMessage
+  PartitionKey partition_key;
+  select (SendRequest.message.content_type) {
+    case application:
+    case proposal:
+    case commit:
+      CommitData commit_data;
+  }
+} SendRequest;
+</pre><a href="#section-4.2-2" class="pilcrow">¶</a>
+</div>
+<p id="section-4.2-3">The hub rejects the message if the <code>group_id</code> of <code>message doesn't match any
+known group. Otherwise, the hub sequences the message to the provided
+</code>partition_key` of the group, and pushes the Welcome to any providers.<a href="#section-4.2-3" class="pilcrow">¶</a></p>
+<p id="section-4.2-4">If the message is a commit, then a <code>CommitData</code> is provided which contains an
+optional GroupInfo in <code>group_info</code> if external joining is supported. If any
+Welcome messages need to be sent, a <code>WelcomeData</code> is provided which contains the
+Welcome in <code>welcome</code>, and a list of service provider ids in <code>service_providers</code>.
+The <code>service_providers</code> array <span class="bcp14">MUST</span> be the same length as the <code>secrets</code> array of
+the Welcome message. Each provider indicated in <code>service_providers</code> corresponds
+one-to-one with the user at the same entry in the <code>secrets</code> array.<a href="#section-4.2-4" class="pilcrow">¶</a></p>
+<p id="section-4.2-5">If <code>group_info</code> does not have a <code>ratchet_tree</code> extension and the hub is unable
+to infer a ratchet tree that matches <code>GroupInfo.group_context.tree_hash</code>, the
+hub rejects the request such that it can be retried with an explicit ratchet
+tree provided.<a href="#section-4.2-5" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="welcome">
+<section id="section-4.3">
+        <h3 id="name-welcome">
+<a href="#section-4.3" class="section-number selfRef">4.3. </a><a href="#name-welcome" class="section-name selfRef">Welcome</a>
+        </h3>
+<p id="section-4.3-1">When a user of a non-hub Service Provider is added to a group, the hub first
+contacts the Service Provider and lists the <code>KeyPackageRef</code> entries that were
+indicated as belonging to this Service Provider. If the Service Provider
+responds affirmatively, the hub pushes the Welcome message.<a href="#section-4.3-1" class="pilcrow">¶</a></p>
+<p id="section-4.3-2">The first step is done by sending a <code>WelcomeInitRequest</code> to the Service
+Provider:<a href="#section-4.3-2" class="pilcrow">¶</a></p>
+<div class="lang-tls-presentation sourcecode" id="section-4.3-3">
+<pre>
+struct {
+  KeyPackageRef key_package_refs&lt;V&gt;;
+} WelcomeInitRequest;
+</pre><a href="#section-4.3-3" class="pilcrow">¶</a>
+</div>
+<p id="section-4.3-4">The Welcome message is provided as an encoded <code>MLSMessage</code>.<a href="#section-4.3-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="receiving-messages">
+<section id="section-4.4">
+        <h3 id="name-receiving-messages">
+<a href="#section-4.4" class="section-number selfRef">4.4. </a><a href="#name-receiving-messages" class="section-name selfRef">Receiving Messages</a>
+        </h3>
+<p id="section-4.4-1">When a follower has a user participating in a group, and that user wishes to
+receive a message, the follower issues a <code>ReceiveRequest</code> to the hub:<a href="#section-4.4-1" class="pilcrow">¶</a></p>
+<div class="lang-tls-presentation sourcecode" id="section-4.4-2">
+<pre>
+struct {
+  PartitionKey partition_key;
+  uint32 counter;
+} ReceiveRequest;
+</pre><a href="#section-4.4-2" class="pilcrow">¶</a>
+</div>
+<p id="section-4.4-3">The <code>partition_key</code> field contains the partition key that the user wishes to
+receive messages for, and the <code>counter</code> field contains the number of messages
+the user has already received in that partition. The hub responds with the
+following, which represents a series of messages in a series of epochs:<a href="#section-4.4-3" class="pilcrow">¶</a></p>
+<div class="lang-tls-presentation sourcecode" id="section-4.4-4">
+<pre>
+opaque MaskedPartitionKey&lt;V&gt;;
+
+struct {
+  MLSMessage message; // PublicMessage or PrivateMessage
+  select (Message.message.content_type) {
+    case application:
+    case proposal:
+    case commit:
+      optional&lt;MLSMessage&gt; group_info; // GroupInfo
+  }
+} Message;
+
+struct {
+  Message messages&lt;V&gt;;
+} Epoch;
+
+struct {
+  MaskedPartitionKey masked_partition_key; // = Hash(partition_key)
+  Epoch epoch;
+} HintedEpoch;
+
+struct {
+  Epoch epoch;
+  HintedEpoch hints&lt;V&gt;;
+} ReceiveResponse;
+</pre><a href="#section-4.4-4" class="pilcrow">¶</a>
+</div>
+<p id="section-4.4-5">The <code>epoch</code> field contains a list of messages sent to the requested
+<code>partition_key</code>, skipping the first <code>counter</code> messages. Messages sent to other
+epochs may be provided in <code>hints</code>. Each <code>HintedEpoch</code> structure contains a
+masked partition key and a list of messages sent to that partition key
+(skipping none).<a href="#section-4.4-5" class="pilcrow">¶</a></p>
+<p id="section-4.4-6">The same epoch may not be referenced twice separately in the same
+<code>ReceiveResponse</code>. No order between epochs may be inferred by the order in
+<code>hints</code>. However, the order of the <code>messages</code> array in each <code>Epoch</code> does reflect
+the order that the messages were sequenced and should be processed.<a href="#section-4.4-6" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
 </div>
 <div id="policy-enforcement">
-<section id="section-4">
+<section id="section-5">
       <h2 id="name-policy-enforcement">
-<a href="#section-4" class="section-number selfRef">4. </a><a href="#name-policy-enforcement" class="section-name selfRef">Policy Enforcement</a>
+<a href="#section-5" class="section-number selfRef">5. </a><a href="#name-policy-enforcement" class="section-name selfRef">Policy Enforcement</a>
       </h2>
-<p id="section-4-1">Generally, a hub or follower DS is only able to enforce "negative" policy on the
+<p id="section-5-1">Generally, a hub or follower DS is only able to enforce "negative" policy on the
 aspects of the group state that it has visiblity into. "Negative" policy
 consists of rules for rejecting messages which are unambiguously invalid.
 Examples of such rules might include rejecting application messages from a user
 that is muted, or rejecting a commit that contains an Add proposal for a banned
-user.<a href="#section-4-1" class="pilcrow">¶</a></p>
-<p id="section-4-2">Keeping in mind that the group may fork when there are buggy or malicious
+user.<a href="#section-5-1" class="pilcrow">¶</a></p>
+<p id="section-5-2">Keeping in mind that the group may fork when there are buggy or malicious
 clients, but that clients clearly indicate which fork they are sending their
 message to, the DS must always make policy enforcmenent decisions with respect
 to the group state as it exists in the indicated fork. If one fork of a group
 exists where a proposal was sent that updated the group metadata to ban a
 specific user, but another fork exists where this proposal was not sent (or not
-accepted), the ban must only apply in the fork that accepted the proposal.<a href="#section-4-2" class="pilcrow">¶</a></p>
-<p id="section-4-3">A DS <span class="bcp14">MUST NOT</span> reject messages based on criteria that are not unambiguously known
+accepted), the ban must only apply in the fork that accepted the proposal.<a href="#section-5-2" class="pilcrow">¶</a></p>
+<p id="section-5-3">A DS <span class="bcp14">MUST NOT</span> reject messages based on criteria that are not unambiguously known
 by the DS to be satisfied. In particular, a DS can not enforce a per-user rate
 limit on messages sent to the group for any users that are not local to the DS.
 When the DS has a local relationship with a user, the DS can authenticate the
 user and unambiguously rate-limit just them. However, a hub DS can not
 rate-limit a follower DS's users without speculating on an MLS message's
-content.<a href="#section-4-3" class="pilcrow">¶</a></p>
-<p id="section-4-4">It's understood that hub servers will make arrangements with follower servers,
+content.<a href="#section-5-3" class="pilcrow">¶</a></p>
+<p id="section-5-4">It's understood that hub servers will make arrangements with follower servers,
 where the follower server enforces the hub's policies in situations where the
 hub can not, as a precondition to interoperate. This includes rate limits but
 also for example, if one of the follower server's users are banned by the hub,
 enforcing that the banned user is not allowed in any groups hosted by the hub.
 (Noting that the hub would be unable to ban a follower server's user themselves,
-in cases where a group's handshake messages are encrypted.)<a href="#section-4-4" class="pilcrow">¶</a></p>
-<p id="section-4-5">Ultimately, while a DS can reject <em>some</em> abusive messages, clients must be aware
+in cases where a group's handshake messages are encrypted.)<a href="#section-5-4" class="pilcrow">¶</a></p>
+<p id="section-5-5">Ultimately, while a DS can reject <em>some</em> abusive messages, clients must be aware
 of the policy a group is under and enforce it themselves. Messages which violate
 the group's policy <span class="bcp14">MUST</span> be ignored and supressed by the UI, as if they were
 cryptographically invalid. Clients <span class="bcp14">SHOULD</span> report to their local DS when the hub
-or another follower is not meeting the preconditions to interoperate.<a href="#section-4-5" class="pilcrow">¶</a></p>
-<p id="section-4-6">A DS <span class="bcp14">MUST NOT</span> enforce "positive" policy decisions, consisting of rules that
-require a given message to be accepted by the members of the group.<a href="#section-4-6" class="pilcrow">¶</a></p>
+or another follower is not meeting the preconditions to interoperate.<a href="#section-5-5" class="pilcrow">¶</a></p>
+<p id="section-5-6">A DS <span class="bcp14">MUST NOT</span> enforce "positive" policy decisions, consisting of rules that
+require a given message to be accepted by the members of the group.<a href="#section-5-6" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="iana-considerations">
-<section id="section-5">
+<section id="section-6">
       <h2 id="name-iana-considerations">
-<a href="#section-5" class="section-number selfRef">5. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
+<a href="#section-6" class="section-number selfRef">6. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
       </h2>
-<p id="section-5-1">This document has no IANA actions.<a href="#section-5-1" class="pilcrow">¶</a></p>
+<p id="section-6-1">This document has no IANA actions.<a href="#section-6-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="sec-normative-references">
-<section id="section-6">
+<section id="section-7">
       <h2 id="name-normative-references">
-<a href="#section-6" class="section-number selfRef">6. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
+<a href="#section-7" class="section-number selfRef">7. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
       </h2>
 <dl class="references">
 <dt id="RFC2119">[RFC2119]</dt>
