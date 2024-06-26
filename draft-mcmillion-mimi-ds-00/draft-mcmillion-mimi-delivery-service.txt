@@ -1,0 +1,499 @@
+
+
+
+
+More Instant Messaging Interoperability                     B. McMillion
+Internet-Draft                                              26 June 2024
+Intended status: Informational                                          
+Expires: 28 December 2024
+
+
+             Robust and Privacy-Preserving Delivery Service
+              draft-mcmillion-mimi-delivery-service-latest
+
+Abstract
+
+   This document describes a federated MLS Delivery Service (DS) for use
+   in the More Instant Messaging Interoperability (MIMI) protocol.  The
+   DS provides for the delivery of KeyPackages, Welcome messages, and
+   group handshake/application messages.
+
+About This Document
+
+   This note is to be removed before publishing as an RFC.
+
+   The latest revision of this draft can be found at
+   https://Bren2010.github.io/draft-mimi-ds/draft-mcmillion-mimi-
+   delivery-service.html.  Status information for this document may be
+   found at https://datatracker.ietf.org/doc/draft-mcmillion-mimi-
+   delivery-service/.
+
+   Discussion of this document takes place on the More Instant Messaging
+   Interoperability Working Group mailing list (mailto:mimi@ietf.org),
+   which is archived at https://mailarchive.ietf.org/arch/browse/mimi/.
+   Subscribe at https://www.ietf.org/mailman/listinfo/mimi/.
+
+   Source for this draft and an issue tracker can be found at
+   https://github.com/Bren2010/draft-mimi-ds.
+
+Status of This Memo
+
+   This Internet-Draft is submitted in full conformance with the
+   provisions of BCP 78 and BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF).  Note that other groups may also distribute
+   working documents as Internet-Drafts.  The list of current Internet-
+   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   This Internet-Draft will expire on 28 December 2024.
+
+Copyright Notice
+
+   Copyright (c) 2024 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+   This document is subject to BCP 78 and the IETF Trust's Legal
+   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+   license-info) in effect on the date of publication of this document.
+   Please review these documents carefully, as they describe your rights
+   and restrictions with respect to this document.  Code Components
+   extracted from this document must include Revised BSD License text as
+   described in Section 4.e of the Trust Legal Provisions and are
+   provided without warranty as described in the Revised BSD License.
+
+Table of Contents
+
+   1.  Introduction
+   2.  Conventions and Definitions
+   3.  Partition Keys
+   4.  Endpoints
+     4.1.  Key Packages
+       4.1.1.  Privacy
+     4.2.  Sending Messages
+     4.3.  Welcome
+     4.4.  Receiving Messages
+     4.5.  External Joins
+   5.  Fork Termination
+   6.  Policy Enforcement
+   7.  Example Flows
+     7.1.  Creating a Group
+     7.2.  Externally Joining
+     7.3.  Self-Remove
+   8.  IANA Considerations
+   9.  Normative References
+   Acknowledgments
+   Author's Address
+
+1.  Introduction
+
+   TODO Introduction
+
+2.  Conventions and Definitions
+
+   The following abbreviations are used where convenient:
+
+   Local Service Provider (LSP):  The Service Provider preferred by the
+      referenced user.
+
+   Remote Service Provider (RSP):  Any Service Provider which is not the
+      LSP.
+
+   Hub:  The Service Provider which created and hosts a referenced
+      group.  Group messages and Welcome messages are always sent to the
+      hub for sequencing and fanout.
+
+   Follower:  Service Providers that interact with a hub to allow their
+      users to interact with a group which the hub hosts.
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+   "OPTIONAL" in this document are to be interpreted as described in
+   BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all
+   capitals, as shown here.
+
+3.  Partition Keys
+
+   A partition key is a short secret that group members export from the
+   MLS key schedule.  Whenever members send or receive group messages,
+   they provide the partition key for the current epoch.  Messages sent
+   with a given partition key are only provided to users who request to
+   receive messages with the same partition key.  (Exceptions may be
+   selectively made for external commits / proposals, given that the
+   sender isn't in the group yet.)
+
+   The partition key acts as epoch-level access control, in addition to
+   the group ID.  Users which have been removed from a group may still
+   be able to message the group, as they know the group ID.  However,
+   they will not know the correct partition key.
+
+   Service Providers MUST NOT implement hard-and-fast rules about which
+   partition keys are acceptable.  Instead, it should be considered as a
+   general signal of abuse or spam.
+
+4.  Endpoints
+
+   The following endpoints are provided by a Delivery Service.  All
+   endpoints exposed by a Delivery Service are accessed by third-party
+   Service Providers, for the purpose of learning about the Service
+   Provider's users or interacting with a group for which the Service
+   Provider is the hub.
+
+4.1.  Key Packages
+
+   It's assumed that users have already interacted with a Discovery
+   Service to learn the user ID and preferred Service Provider of their
+   contacts.  As part of discovery, users also receive a bearer token
+   associated with each contact.  The bearer token may or may not be
+   unique to the user who requested it, depending on the RSP's
+   preference.
+
+   When a user wishes to fetch a KeyPackage for the purpose of adding a
+   user to a group, the user submits a KeyPackageRequest to the RSP,
+   with its LSP acting as an OHTTP proxy:
+
+   struct {
+     opaque user_id<V>;
+     opaque bearer_token<V>;
+     ProtocolVersion version;
+     CipherSuite cipher_suite;
+   } KeyPackageRequest;
+
+   The user_id field contains the Service-Specific Identifier of the
+   user, bearer_token contains the bearer token learned during
+   discovery, and version and cipher_suite contain the desired MLS group
+   parameters.  The RSP responds with a KeyPackageResponse structure
+   that matches the requested parameters:
+
+   struct {
+     KeyPackage key_package;
+   } KeyPackageResponse;
+
+4.1.1.  Privacy
+
+   Several KeyPackageRequest structures MAY be bundled into the same
+   transaction, if a user needs KeyPackages from many users of the same
+   service and is comfortable leaking that these users are associated.
+
+   Note that the KeyPackageRequest and KeyPackageResponse structures are
+   exchanged over OHTTP.  This is done primarily to prevent the LSP from
+   learning who their local user wishes to contact, but it also
+   restricts how much the RSP can learn about who wants to contact their
+   user:
+
+   To prevent abuse (such as constantly exhausting a user's uploaded
+   KeyPackages), this endpoint is protected with a bearer token learned
+   during discovery.  The RSP can construct the bearer token however it
+   feels is necessary to preserve privacy and manage abuse.  If abuse is
+   a non-issue, a bearer token can be long-lived and shared by every
+   user.  Alternatively, users may be provided a uniquely identifying
+   bearer token.  Bearer tokens that are abused may be invalidated at-
+   will by the RSP, triggering users to go through the discovery flow
+   again.
+
+4.2.  Sending Messages
+
+   When a follower has a user participating in a group, and that user
+   wishes to send a message, the follower issues a SendRequest to the
+   hub:
+
+   opaque PartitionKey<16>;
+   opaque ServiceProviderId<V>;
+
+   struct {
+     MLSMessage welcome; // Welcome
+     ServiceProviderId service_providers<V>;
+   } WelcomeData;
+
+   struct {
+     PartitionKey next_partition_key;
+     optional<MLSMessage> group_info; // GroupInfo
+     optional<WelcomeData> welcome_data;
+   } CommitData;
+
+   struct {
+     MLSMessage message; // PublicMessage or PrivateMessage
+     PartitionKey partition_key;
+     select (SendRequest.message.content_type) {
+       case application:
+       case proposal:
+       case commit:
+         CommitData commit_data;
+     }
+   } SendRequest;
+
+   The hub rejects the message if the group_id of message doesn't match
+   any known group.  Otherwise, the hub sequences the message to the
+   providedpartition_key` of the group, and pushes the Welcome to any
+   providers.
+
+   If the message is a commit, then a CommitData is provided which
+   contains the next partition key in next_partition_key, and an
+   optional GroupInfo in group_info to support external joiners.  If any
+   Welcome messages need to be sent, a WelcomeData is provided which
+   contains the Welcome in welcome, and a list of service provider ids
+   in service_providers.  The service_providers array MUST be the same
+   length as the secrets array of the Welcome message.  Each provider
+   indicated in service_providers corresponds one-to-one with the user
+   at the same entry in the secrets array.
+
+   If group_info does not have a ratchet_tree extension and the hub is
+   unable to infer a ratchet tree that matches
+   GroupInfo.group_context.tree_hash, the hub rejects the request such
+   that it can be retried with an explicit ratchet tree provided.
+
+4.3.  Welcome
+
+   When a user of a non-hub Service Provider is added to a group, the
+   hub first contacts the Service Provider and lists the KeyPackageRef
+   entries that were indicated as belonging to this Service Provider.
+   If the Service Provider responds affirmatively, the hub pushes the
+   Welcome message.
+
+   The first step is done by sending a WelcomeInitRequest to the Service
+   Provider:
+
+   struct {
+     KeyPackageRef key_package_refs<V>;
+   } WelcomeInitRequest;
+
+   The Welcome message is provided as an encoded MLSMessage.
+
+4.4.  Receiving Messages
+
+   When a follower has a user participating in a group, and that user
+   wishes to receive a message, the follower issues a ReceiveRequest to
+   the hub:
+
+   struct {
+     PartitionKey partition_key;
+     uint32 counter;
+   } ReceiveRequest;
+
+   The partition_key field contains the partition key that the user
+   wishes to receive messages for, and the counter field contains the
+   number of messages the user has already received in that partition.
+   The hub responds with the following, which represents a series of
+   messages in a series of epochs:
+
+   opaque MaskedPartitionKey<V>; // = Hash(partition_key)
+
+   struct {
+     MLSMessage message; // PublicMessage or PrivateMessage
+     select (Message.message.content_type) {
+       case application:
+       case proposal:
+       case commit:
+         MaskedPartitionKey next_partition_key;
+         optional<MLSMessage> group_info; // GroupInfo
+     }
+   } Message;
+
+   struct {
+     Message messages<V>;
+   } Epoch;
+
+   struct {
+     MaskedPartitionKey masked_partition_key;
+     Epoch epoch;
+   } HintedEpoch;
+
+   struct {
+     Epoch epoch;
+     HintedEpoch hints<V>;
+   } ReceiveResponse;
+
+   The epoch field contains a list of messages sent to the requested
+   partition_key, skipping the first counter messages.  Messages sent to
+   other epochs may be provided in hints.  Each HintedEpoch structure
+   contains a masked partition key and a list of messages sent to that
+   partition key (skipping none).
+
+   The same epoch may not be referenced twice separately in the same
+   ReceiveResponse.  No order between epochs may be inferred by the
+   order in hints.  However, the order of the messages array in each
+   Epoch does reflect the order that the messages were sequenced and
+   should be processed.
+
+   The hub MAY proactively push ReceiveResponse structures to a
+   following Service Provider.  The hub has complete discretion in which
+   epochs it provides in hints, and when it pushes ReceiveResponse
+   structures.  In a group with encrypted handshake messages, the hub
+   may choose to use these features sparingly.  In a group with
+   unencrypted handshake messages, the hub will have a clearer view of
+   which messages need to be delivered to which follower Service
+   Providers and can act on that.
+
+   When processing Commits, users MUST ignore Commits where
+   next_partition_key or group_info does not match what was expected.
+
+4.5.  External Joins
+
+   A user that wishes to perform an external join to a group may do so
+   by sending an ExternalJoinRequest to the hub:
+
+   struct {
+     MLSMessage message; // PublicMessage
+     CommitData commit_data;
+   } ExternalJoinRequest;
+
+   If the hub recognizes the group_id and successfully validates the
+   request, it sequences the message to the most recent partition key of
+   the group.
+
+   A group does not require a published GroupInfo to allow
+   ExternalJoinRequests, however a user can request it as follows:
+
+   struct {
+     opaque group_id<V>;
+   } GroupInfoRequest;
+
+   struct {
+     MLSMessage group_info; // GroupInfo;
+     optional<RatchetTree> ratchet_tree;
+   } GroupInfoResponse;
+
+   The hub MAY provide an inferred ratchet tree in ratchet_tree if one
+   is not present in the group_info.
+
+5.  Fork Termination
+
+   The endpoints above are designed to gracefully support forks in the
+   group state through the use of the partition key.  Forks can occur
+   when a buggy or malicious member sends a Commit which members of the
+   group are unable to process, or that members of the group reject for
+   violating policy.  In this case, the malicious/buggy member would
+   process its own Commit, moving to a new epoch with a new partition
+   key, while all other group members ignore it and stay in the current
+   epoch.  Forks can also occur when a member attempts to externally
+   join a group, and the Delivery Service sequences the external Commit
+   to an incorrect partition key (such as one resulting from the
+   previous case).
+
+   When a hub detects that the group state has forked, it MAY decide to
+   terminate one of the branches by blocking further messages from being
+   sent to its partition key.  When or if to terminate a branch, is left
+   to the discretion of the hub.  Users MUST NOT respond to a branch
+   termination by automatically issuing an external join to rejoin the
+   group.
+
+6.  Policy Enforcement
+
+   Generally, a hub or follower DS is only able to enforce "negative"
+   policy on the aspects of the group state that it has visiblity into.
+   "Negative" policy consists of rules for rejecting messages which are
+   unambiguously invalid.  Examples of such rules might include
+   rejecting application messages from a user that is muted, or
+   rejecting a commit that contains an Add proposal for a banned user.
+
+   Keeping in mind that the group may fork when there are buggy or
+   malicious clients, but that clients clearly indicate which fork they
+   are sending their message to, the DS must always make policy
+   enforcmenent decisions with respect to the group state as it exists
+   in the indicated fork.  If one fork of a group exists where a
+   proposal was sent that updated the group metadata to ban a specific
+   user, but another fork exists where this proposal was not sent (or
+   not accepted), the ban must only apply in the fork that accepted the
+   proposal.
+
+   A DS MUST NOT reject messages based on criteria that are not
+   unambiguously known by the DS to be satisfied.  In particular, a DS
+   can not enforce a per-user rate limit on messages sent to the group
+   for any users that are not local to the DS.  When the DS has a local
+   relationship with a user, the DS can authenticate the user and
+   unambiguously rate-limit just them.  However, a hub DS can not rate-
+   limit a follower DS's users without speculating on an MLS message's
+   content.
+
+   It's understood that hub servers will make arrangements with follower
+   servers, where the follower server enforces the hub's policies in
+   situations where the hub can not, as a precondition to interoperate.
+   This includes rate limits but also for example, if one of the
+   follower server's users are banned by the hub, enforcing that the
+   banned user is not allowed in any groups hosted by the hub.  (Noting
+   that the hub would be unable to ban a follower server's user
+   themselves, in cases where a group's handshake messages are
+   encrypted.)
+
+   Ultimately, while a DS can reject _some_ abusive messages, clients
+   must be aware of the policy a group is under and enforce it
+   themselves.  Messages which violate the group's policy MUST be
+   ignored and supressed by the UI, as if they were cryptographically
+   invalid.  Clients SHOULD report to their local DS when the hub or
+   another follower is not meeting the preconditions to interoperate.
+
+   A DS MUST NOT enforce "positive" policy decisions, consisting of
+   rules that require a given message to be accepted by the members of
+   the group.
+
+7.  Example Flows
+
+7.1.  Creating a Group
+
+   1.  User fetches KeyPackages for all the initial group members it
+       wishes to include.  (Section 4.1)
+
+   2.  User initiates creation of the group with its LSP and provides
+       the Welcome message.
+
+   3.  LSP (now hub) fans out Welcome message to all follower Service
+       Providers.  (Section 4.3)
+
+   4.  Followers begin reading messages.  (Section 4.4)
+
+7.2.  Externally Joining
+
+   1.  User requests the group's GroupInfo and sends an external Commit.
+       (Section 4.5)
+
+   2.  User can immediately begin sending/receiving messages to the new
+       partition key its Commit created.  (Section 4.2 and Section 4.4)
+
+   3.  Group members that receive the external Commit will verify it,
+       and if verification succeeds they will begin processing messages
+       from the new partition key.
+
+7.3.  Self-Remove
+
+   1.  User sends a Remove proposal to group.  (Section 4.2)
+
+   2.  User informs its LSP that it no longer wishes to receive messages
+       for the group.
+
+   3.  Assuming this is the only user the LSP has in the group, it stops
+       requesting messages for the group / starts rejecting message
+       pushes.
+
+   After sending its Remove proposal, the user SHOULD continue receiving
+   group messages for the same epoch to check that it's proposal was
+   sequenced before the next Commit, and resend it if not.  However,
+   this isn't required.
+
+8.  IANA Considerations
+
+   This document has no IANA actions.
+
+9.  Normative References
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
+              <https://www.rfc-editor.org/rfc/rfc2119>.
+
+   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+              May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
+
+Acknowledgments
+
+   TODO acknowledge.
+
+Author's Address
+
+   Brendan McMillion
+   Email: brendanmcmillion@gmail.com
