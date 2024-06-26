@@ -3,9 +3,9 @@
 
 
 More Instant Messaging Interoperability                     B. McMillion
-Internet-Draft                                    Your Organization Here
-Intended status: Informational                              25 June 2024
-Expires: 27 December 2024
+Internet-Draft                                              26 June 2024
+Intended status: Informational                                          
+Expires: 28 December 2024
 
 
              Robust and Privacy-Preserving Delivery Service
@@ -51,7 +51,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 27 December 2024.
+   This Internet-Draft will expire on 28 December 2024.
 
 Copyright Notice
 
@@ -78,9 +78,15 @@ Table of Contents
      4.2.  Sending Messages
      4.3.  Welcome
      4.4.  Receiving Messages
-   5.  Policy Enforcement
-   6.  IANA Considerations
-   7.  Normative References
+     4.5.  External Joins
+   5.  Fork Termination
+   6.  Policy Enforcement
+   7.  Example Flows
+     7.1.  Creating a Group
+     7.2.  Externally Joining
+     7.3.  Self-Remove
+   8.  IANA Considerations
+   9.  Normative References
    Acknowledgments
    Author's Address
 
@@ -205,6 +211,7 @@ Table of Contents
    } WelcomeData;
 
    struct {
+     PartitionKey next_partition_key;
      optional<MLSMessage> group_info; // GroupInfo
      optional<WelcomeData> welcome_data;
    } CommitData;
@@ -226,13 +233,14 @@ Table of Contents
    providers.
 
    If the message is a commit, then a CommitData is provided which
-   contains an optional GroupInfo in group_info if external joining is
-   supported.  If any Welcome messages need to be sent, a WelcomeData is
-   provided which contains the Welcome in welcome, and a list of service
-   provider ids in service_providers.  The service_providers array MUST
-   be the same length as the secrets array of the Welcome message.  Each
-   provider indicated in service_providers corresponds one-to-one with
-   the user at the same entry in the secrets array.
+   contains the next partition key in next_partition_key, and an
+   optional GroupInfo in group_info to support external joiners.  If any
+   Welcome messages need to be sent, a WelcomeData is provided which
+   contains the Welcome in welcome, and a list of service provider ids
+   in service_providers.  The service_providers array MUST be the same
+   length as the secrets array of the Welcome message.  Each provider
+   indicated in service_providers corresponds one-to-one with the user
+   at the same entry in the secrets array.
 
    If group_info does not have a ratchet_tree extension and the hub is
    unable to infer a ratchet tree that matches
@@ -273,7 +281,7 @@ Table of Contents
    The hub responds with the following, which represents a series of
    messages in a series of epochs:
 
-   opaque MaskedPartitionKey<V>;
+   opaque MaskedPartitionKey<V>; // = Hash(partition_key)
 
    struct {
      MLSMessage message; // PublicMessage or PrivateMessage
@@ -281,6 +289,7 @@ Table of Contents
        case application:
        case proposal:
        case commit:
+         MaskedPartitionKey next_partition_key;
          optional<MLSMessage> group_info; // GroupInfo
      }
    } Message;
@@ -290,7 +299,7 @@ Table of Contents
    } Epoch;
 
    struct {
-     MaskedPartitionKey masked_partition_key; // = Hash(partition_key)
+     MaskedPartitionKey masked_partition_key;
      Epoch epoch;
    } HintedEpoch;
 
@@ -311,7 +320,69 @@ Table of Contents
    Epoch does reflect the order that the messages were sequenced and
    should be processed.
 
-5.  Policy Enforcement
+   The hub MAY proactively push ReceiveResponse structures to a
+   following Service Provider.  The hub has complete discretion in which
+   epochs it provides in hints, and when it pushes ReceiveResponse
+   structures.  In a group with encrypted handshake messages, the hub
+   may choose to use these features sparingly.  In a group with
+   unencrypted handshake messages, the hub will have a clearer view of
+   which messages need to be delivered to which follower Service
+   Providers and can act on that.
+
+   When processing Commits, users MUST ignore Commits where
+   next_partition_key or group_info does not match what was expected.
+
+4.5.  External Joins
+
+   A user that wishes to perform an external join to a group may do so
+   by sending an ExternalJoinRequest to the hub:
+
+   struct {
+     MLSMessage message; // PublicMessage
+     CommitData commit_data;
+   } ExternalJoinRequest;
+
+   If the hub recognizes the group_id and successfully validates the
+   request, it sequences the message to the most recent partition key of
+   the group.
+
+   A group does not require a published GroupInfo to allow
+   ExternalJoinRequests, however a user can request it as follows:
+
+   struct {
+     opaque group_id<V>;
+   } GroupInfoRequest;
+
+   struct {
+     MLSMessage group_info; // GroupInfo;
+     optional<RatchetTree> ratchet_tree;
+   } GroupInfoResponse;
+
+   The hub MAY provide an inferred ratchet tree in ratchet_tree if one
+   is not present in the group_info.
+
+5.  Fork Termination
+
+   The endpoints above are designed to gracefully support forks in the
+   group state through the use of the partition key.  Forks can occur
+   when a buggy or malicious member sends a Commit which members of the
+   group are unable to process, or that members of the group reject for
+   violating policy.  In this case, the malicious/buggy member would
+   process its own Commit, moving to a new epoch with a new partition
+   key, while all other group members ignore it and stay in the current
+   epoch.  Forks can also occur when a member attempts to externally
+   join a group, and the Delivery Service sequences the external Commit
+   to an incorrect partition key (such as one resulting from the
+   previous case).
+
+   When a hub detects that the group state has forked, it MAY decide to
+   terminate one of the branches by blocking further messages from being
+   sent to its partition key.  When or if to terminate a branch, is left
+   to the discretion of the hub.  Users MUST NOT respond to a branch
+   termination by automatically issuing an external join to rejoin the
+   group.
+
+6.  Policy Enforcement
 
    Generally, a hub or follower DS is only able to enforce "negative"
    policy on the aspects of the group state that it has visiblity into.
@@ -360,11 +431,54 @@ Table of Contents
    rules that require a given message to be accepted by the members of
    the group.
 
-6.  IANA Considerations
+7.  Example Flows
+
+7.1.  Creating a Group
+
+   1.  User fetches KeyPackages for all the initial group members it
+       wishes to include.  (Section 4.1)
+
+   2.  User initiates creation of the group with its LSP and provides
+       the Welcome message.
+
+   3.  LSP (now hub) fans out Welcome message to all follower Service
+       Providers.  (Section 4.3)
+
+   4.  Followers begin reading messages.  (Section 4.4)
+
+7.2.  Externally Joining
+
+   1.  User requests the group's GroupInfo and sends an external Commit.
+       (Section 4.5)
+
+   2.  User can immediately begin sending/receiving messages to the new
+       partition key its Commit created.  (Section 4.2 and Section 4.4)
+
+   3.  Group members that receive the external Commit will verify it,
+       and if verification succeeds they will begin processing messages
+       from the new partition key.
+
+7.3.  Self-Remove
+
+   1.  User sends a Remove proposal to group.  (Section 4.2)
+
+   2.  User informs its LSP that it no longer wishes to receive messages
+       for the group.
+
+   3.  Assuming this is the only user the LSP has in the group, it stops
+       requesting messages for the group / starts rejecting message
+       pushes.
+
+   After sending its Remove proposal, the user SHOULD continue receiving
+   group messages for the same epoch to check that it's proposal was
+   sequenced before the next Commit, and resend it if not.  However,
+   this isn't required.
+
+8.  IANA Considerations
 
    This document has no IANA actions.
 
-7.  Normative References
+9.  Normative References
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
@@ -382,5 +496,4 @@ Acknowledgments
 Author's Address
 
    Brendan McMillion
-   Your Organization Here
    Email: brendanmcmillion@gmail.com
