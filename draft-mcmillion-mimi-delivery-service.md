@@ -25,7 +25,6 @@ venue:
 author:
  -
     fullname: "Brendan McMillion"
-    organization: Your Organization Here
     email: "brendanmcmillion@gmail.com"
 
 normative:
@@ -159,6 +158,7 @@ struct {
 } WelcomeData;
 
 struct {
+  PartitionKey next_partition_key;
   optional<MLSMessage> group_info; // GroupInfo
   optional<WelcomeData> welcome_data;
 } CommitData;
@@ -179,12 +179,13 @@ The hub rejects the message if the `group_id` of `message doesn't match any
 known group. Otherwise, the hub sequences the message to the provided
 `partition_key` of the group, and pushes the Welcome to any providers.
 
-If the message is a commit, then a `CommitData` is provided which contains an
-optional GroupInfo in `group_info` if external joining is supported. If any
-Welcome messages need to be sent, a `WelcomeData` is provided which contains the
-Welcome in `welcome`, and a list of service provider ids in `service_providers`.
-The `service_providers` array MUST be the same length as the `secrets` array of
-the Welcome message. Each provider indicated in `service_providers` corresponds
+If the message is a commit, then a `CommitData` is provided which contains the
+next partition key in `next_partition_key`, and an optional GroupInfo in
+`group_info` to support external joiners. If any Welcome messages need to
+be sent, a `WelcomeData` is provided which contains the Welcome in `welcome`,
+and a list of service provider ids in `service_providers`. The
+`service_providers` array MUST be the same length as the `secrets` array of the
+Welcome message. Each provider indicated in `service_providers` corresponds
 one-to-one with the user at the same entry in the `secrets` array.
 
 If `group_info` does not have a `ratchet_tree` extension and the hub is unable
@@ -228,7 +229,7 @@ the user has already received in that partition. The hub responds with the
 following, which represents a series of messages in a series of epochs:
 
 ~~~ tls-presentation
-opaque MaskedPartitionKey<V>;
+opaque MaskedPartitionKey<V>; // = Hash(partition_key)
 
 struct {
   MLSMessage message; // PublicMessage or PrivateMessage
@@ -236,6 +237,7 @@ struct {
     case application:
     case proposal:
     case commit:
+      MaskedPartitionKey next_partition_key;
       optional<MLSMessage> group_info; // GroupInfo
   }
 } Message;
@@ -245,7 +247,7 @@ struct {
 } Epoch;
 
 struct {
-  MaskedPartitionKey masked_partition_key; // = Hash(partition_key)
+  MaskedPartitionKey masked_partition_key;
   Epoch epoch;
 } HintedEpoch;
 
@@ -267,9 +269,15 @@ The same epoch may not be referenced twice separately in the same
 the order that the messages were sequenced and should be processed.
 
 The hub MAY proactively push `ReceiveResponse` structures to a following Service
-Provider.
+Provider. The hub has complete discretion in which epochs it provides in
+`hints`, and when it pushes `ReceiveResponse` structures. In a group with
+encrypted handshake messages, the hub may choose to use these features
+sparingly. In a group with unencrypted handshake messages, the hub will have a
+clearer view of which messages need to be delivered to which follower Service
+Providers and can act on that.
 
-When processing Commits, users MUST ignore Commits with an invalid `group_info`.
+When processing Commits, users MUST ignore Commits where `next_partition_key` or
+`group_info` does not match what was expected.
 
 ## External Joins
 
@@ -302,6 +310,24 @@ struct {
 
 The hub MAY provide an inferred ratchet tree in `ratchet_tree` if one is not
 present in the `group_info`.
+
+# Fork Termination
+
+The endpoints above are designed to gracefully support forks in the group state
+through the use of the partition key. Forks can occur when a buggy or malicious
+member sends a Commit which members of the group are unable to process, or that
+members of the group reject for violating policy. In this case, the
+malicious/buggy member would process its own Commit, moving to a new epoch with
+a new partition key, while all other group members ignore it and stay in the
+current epoch. Forks can also occur when a member attempts to externally join a
+group, and the Delivery Service sequences the external Commit to an incorrect
+partition key (such as one resulting from the previous case).
+
+When a hub detects that the group state has forked, it MAY decide to terminate
+one of the branches by blocking further messages from being sent to its
+partition key. When or if to terminate a branch, is left to the discretion of
+the hub. Users MUST NOT respond to a branch termination by automatically issuing
+an external join to rejoin the group.
 
 # Policy Enforcement
 
@@ -345,6 +371,31 @@ or another follower is not meeting the preconditions to interoperate.
 A DS MUST NOT enforce "positive" policy decisions, consisting of rules that
 require a given message to be accepted by the members of the group.
 
+# Example Flows
+
+## Creating a Group
+
+1. User fetches KeyPackages for all the initial group members it wishes to include. ({{key-packages}})
+2. User initiates creation of the group with its LSP and provides the Welcome message.
+3. LSP (now hub) fans out Welcome message to all follower Service Providers. ({{welcome}})
+4. Followers begin reading messages. ({{receiving-messages}})
+
+## Externally Joining
+
+1. User requests the group's GroupInfo and sends an external Commit. ({{external-joins}})
+2. User can immediately begin sending/receiving messages to the new partition key its Commit created. ({{sending-messages}} and {{receiving-messages}})
+3. Group members that receive the external Commit will verify it, and if verification succeeds they will begin processing messages from the new partition key.
+
+
+## Self-Remove
+
+1. User sends a `Remove` proposal to group. ({{sending-messages}})
+2. User informs its LSP that it no longer wishes to receive messages for the group.
+3. Assuming this is the only user the LSP has in the group, it stops requesting messages for the group / starts rejecting message pushes.
+
+After sending its `Remove` proposal, the user SHOULD continue receiving group
+messages for the same epoch to check that it's proposal was sequenced before the
+next Commit, and resend it if not. However, this isn't required.
 
 # IANA Considerations
 
